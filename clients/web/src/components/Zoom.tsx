@@ -14,7 +14,6 @@ export const Zoom: FC<Props> = ({ min, max, speed, children }) => {
 		<div
 			style={{ transform: `scale(${zoom})` }}
 			onWheel={(e) => {
-				e.preventDefault();
 				const targetZoom = zoom + e.deltaY * speed;
 				setZoom(clamp(min, targetZoom, max));
 			}}

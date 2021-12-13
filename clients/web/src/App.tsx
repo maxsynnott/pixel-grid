@@ -1,5 +1,6 @@
 import { FC } from "react";
 import { Grid } from "./components/Grid";
+import { Pan } from "./components/Pan";
 import { Zoom } from "./components/Zoom";
 
 const MIN_ZOOM = 1;
@@ -18,7 +19,9 @@ export const App: FC = () => {
 			}}
 		>
 			<Zoom min={MIN_ZOOM} max={MAX_ZOOM} speed={ZOOM_SPEED}>
-				<Grid />
+				<Pan>
+					<Grid />
+				</Pan>
 			</Zoom>
 		</div>
 	);
