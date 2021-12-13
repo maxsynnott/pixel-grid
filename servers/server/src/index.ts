@@ -3,23 +3,21 @@ import { redis } from "./clients/redis";
 import { config } from "./config/config";
 import { numberTo4BitString } from "./helpers/numberTo4BitString";
 import cors from "fastify-cors";
+import { PostPaintBody } from "./types/types";
+import socketIo from "fastify-socket.io";
 
-const app = Fastify();
+const server = Fastify();
 
-app.register(cors, {});
+const corsOptions = {};
+server.register(cors, corsOptions);
+server.register(socketIo, { cors: corsOptions });
 
-app.get("/grid", async (_request, reply) => {
+server.get("/grid", async (_request, reply) => {
 	const response = await redis.get("grid");
-	reply.send(response);
+	reply.header("Content-Type", "application/octet-stream").send(response);
 });
 
-interface PostPaintBody {
-	x: number;
-	y: number;
-	color: number;
-}
-
-app.post<{ Body: PostPaintBody }>("/paint", async (request, reply) => {
+server.post<{ Body: PostPaintBody }>("/paint", async (request, reply) => {
 	const { x, y, color } = request.body;
 	if (x >= config.grid.width || y >= config.grid.height || color >= 16)
 		throw new Error();
@@ -27,10 +25,17 @@ app.post<{ Body: PostPaintBody }>("/paint", async (request, reply) => {
 	const offset = (y * config.grid.width + x) * 4;
 	const value = numberTo4BitString(color);
 	await redis.setrange("grid", offset, value);
+	server.io.emit("paint", { x, y, color });
 	reply.status(204).send();
 });
 
+server.ready(() =>
+	server.io.on("connection", (socket) => {
+		console.log("Connected", { id: socket.id });
+	})
+);
+
 const port = process.env.PORT || 8080;
-app.listen(port, (err) => {
+server.listen(port, (err) => {
 	if (!err) console.log(`Listening on port ${port}`);
 });

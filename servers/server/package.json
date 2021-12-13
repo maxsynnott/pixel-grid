@@ -13,6 +13,7 @@
 	"dependencies": {
 		"fastify": "^3.24.1",
 		"fastify-cors": "^6.0.2",
+		"fastify-socket.io": "^3.0.0",
 		"ioredis": "^4.28.2"
 	},
 	"devDependencies": {

@@ -1,7 +1,10 @@
 import { axios } from "../clients/axios";
 
 export const getGrid = async () => {
-	const { status, data } = await axios.get("/grid");
+	const { status, data } = await axios.get("/grid", {
+		maxBodyLength: 1000000,
+		maxContentLength: 1000000,
+	});
 
 	switch (status) {
 		case 200:

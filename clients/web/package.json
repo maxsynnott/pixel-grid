@@ -10,7 +10,8 @@
     "axios": "^0.24.0",
     "just-clamp": "^4.0.1",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "socket.io-client": "^4.4.0"
   },
   "devDependencies": {
     "@types/react": "^17.0.33",
