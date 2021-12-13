@@ -22,7 +22,7 @@ interface PostPaintBody {
 app.post<{ Body: PostPaintBody }>("/paint", async (request, reply) => {
 	const { x, y, color } = request.body;
 
-	const offset = (y * config.grid.size + x) * 4;
+	const offset = (y * config.grid.width + x) * 4;
 	const value = numberTo4BitString(color);
 	await redis.setrange("grid", offset, value);
 	reply.status(204).send();
