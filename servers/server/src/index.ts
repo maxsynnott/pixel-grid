@@ -21,6 +21,8 @@ interface PostPaintBody {
 
 app.post<{ Body: PostPaintBody }>("/paint", async (request, reply) => {
 	const { x, y, color } = request.body;
+	if (x >= config.grid.width || y >= config.grid.height || color >= 16)
+		throw new Error();
 
 	const offset = (y * config.grid.width + x) * 4;
 	const value = numberTo4BitString(color);

@@ -18,5 +18,14 @@ export const config = {
 		[0, 128, 128, 255],
 		[0, 255, 255, 255],
 	],
-	grid: { height: 100, width: 100 },
+	grid: {
+		height: 100,
+		width: 100,
+		zoom: {
+			initialValue: 4,
+			min: 1,
+			max: 100,
+			speed: 0.1,
+		},
+	},
 };

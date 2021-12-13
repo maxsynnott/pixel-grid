@@ -1,24 +1,8 @@
-import clamp from "just-clamp";
-import { FC, useState } from "react";
+import { FC, useContext } from "react";
+import { ZoomContext } from "../contexts/ZoomContext";
 
-interface Props {
-	min: number;
-	max: number;
-	speed: number;
-}
+export const Zoom: FC = ({ children }) => {
+	const zoom = useContext(ZoomContext);
 
-export const Zoom: FC<Props> = ({ min, max, speed, children }) => {
-	const [zoom, setZoom] = useState(4);
-
-	return (
-		<div
-			style={{ transform: `scale(${zoom})` }}
-			onWheel={(e) => {
-				const targetZoom = zoom + e.deltaY * speed;
-				setZoom(clamp(min, targetZoom, max));
-			}}
-		>
-			{children}
-		</div>
-	);
+	return <div style={{ transform: `scale(${zoom})` }}>{children}</div>;
 };

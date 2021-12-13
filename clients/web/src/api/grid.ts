@@ -10,3 +10,14 @@ export const getGrid = async () => {
 			throw new Error();
 	}
 };
+
+export const paint = async (x: number, y: number, color: number) => {
+	const { status, data } = await axios.post("/paint", { x, y, color });
+
+	switch (status) {
+		case 204:
+			return data;
+		default:
+			throw new Error();
+	}
+};
