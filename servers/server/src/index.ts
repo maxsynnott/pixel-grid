@@ -1,9 +1,11 @@
 import Fastify from "fastify";
+import { redis } from "./clients/redis";
 
 const app = Fastify();
 
-app.get("/", (request, reply) => {
-	reply.send("Hello World!");
+app.get("/grid", async (_request, reply) => {
+	const response = await redis.get("grid");
+	reply.send(response);
 });
 
 const port = process.env.PORT || 8080;
