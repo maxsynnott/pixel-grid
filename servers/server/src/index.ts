@@ -2,8 +2,11 @@ import Fastify from "fastify";
 import { redis } from "./clients/redis";
 import { config } from "./config/config";
 import { numberTo4BitString } from "./helpers/numberTo4BitString";
+import cors from "fastify-cors";
 
 const app = Fastify();
+
+app.register(cors, {});
 
 app.get("/grid", async (_request, reply) => {
 	const response = await redis.get("grid");
