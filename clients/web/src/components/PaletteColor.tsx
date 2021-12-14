@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { config } from "../config/config";
+import { colorIndexToCssString } from "../helpers/colorIndexToCssString";
 
 interface Props {
 	colorIndex: number;
@@ -13,15 +13,13 @@ export const PaletteColor: FC<Props> = ({
 	setSelected,
 }) => {
 	const isSelected = colorIndex === selected;
-	const color = config.colors[colorIndex];
-	const rgbaString = `rgba(${color.join(",")})`;
 
 	return (
 		<div
 			style={{
 				height: 30,
 				width: 30,
-				backgroundColor: rgbaString,
+				backgroundColor: colorIndexToCssString(colorIndex),
 			}}
 			onClick={() => setSelected(colorIndex)}
 		></div>

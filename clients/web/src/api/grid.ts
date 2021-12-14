@@ -1,9 +1,8 @@
 import { axios } from "../clients/axios";
 
 export const getGrid = async () => {
-	const { status, data } = await axios.get("/grid", {
-		maxBodyLength: 1000000,
-		maxContentLength: 1000000,
+	const { status, data } = await axios.get<ArrayBuffer>("/grid", {
+		responseType: "arraybuffer",
 	});
 
 	switch (status) {

@@ -3,17 +3,22 @@ import { getGrid, paint } from "../api/grid";
 import { socket } from "../clients/socket";
 import { config } from "../config/config";
 import { ZoomContext } from "../contexts/ZoomContext";
-import { bitStringToImageData } from "../helpers/bitStringToImageData";
+import { arrayBufferToImageData } from "../helpers/arrayBufferToImageData";
+import { colorIndexToCssString } from "../helpers/colorIndexToCssString";
 
-export const Grid: FC = () => {
+interface Props {
+	selectedColor: number;
+}
+
+export const Grid: FC<Props> = ({ selectedColor }) => {
 	const zoom = useContext(ZoomContext);
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [imageData, setImageData] = useState<ImageData>();
 
 	const fetchGrid = async () => {
-		const bitString = await getGrid();
-		const newImageData = bitStringToImageData(bitString);
+		const arrayBuffer = await getGrid();
+		const newImageData = arrayBufferToImageData(arrayBuffer);
 		setImageData(newImageData);
 	};
 
@@ -26,8 +31,7 @@ export const Grid: FC = () => {
 		if (!context) return;
 
 		const handleEvent = ({ x, y, color }: any) => {
-			const rgbaString = `rgba(${config.colors[color].join(",")})`;
-			context.fillStyle = rgbaString;
+			context.fillStyle = colorIndexToCssString(color);
 			context.fillRect(x, y, 1, 1);
 		};
 
@@ -49,8 +53,7 @@ export const Grid: FC = () => {
 		const rect = canvasRef.current.getBoundingClientRect();
 		const x = Math.floor((event.clientX - rect.left) / zoom);
 		const y = Math.floor((event.clientY - rect.top) / zoom);
-		const color = Math.floor(Math.random() * 16);
-		paint(x, y, color);
+		paint(x, y, selectedColor);
 	};
 
 	const { height, width } = config.grid;
