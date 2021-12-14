@@ -22,7 +22,7 @@ export const config = {
 		height: 1000,
 		width: 1000,
 		zoom: {
-			initialValue: 0.66,
+			initialValue: 0.6,
 			min: 0.5,
 			max: 100,
 			speed: 0.1,
