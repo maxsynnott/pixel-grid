@@ -6,11 +6,7 @@ import { ZoomContext } from "../contexts/ZoomContext";
 import { arrayBufferToImageData } from "../helpers/arrayBufferToImageData";
 import { colorIndexToCssString } from "../helpers/colorIndexToCssString";
 
-interface Props {
-	selectedColor: number;
-}
-
-export const Grid: FC<Props> = ({ selectedColor }) => {
+export const Grid: FC = () => {
 	const zoom = useContext(ZoomContext);
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -53,7 +49,8 @@ export const Grid: FC<Props> = ({ selectedColor }) => {
 		const rect = canvasRef.current.getBoundingClientRect();
 		const x = Math.floor((event.clientX - rect.left) / zoom);
 		const y = Math.floor((event.clientY - rect.top) / zoom);
-		paint(x, y, selectedColor);
+		const color = Number(localStorage.getItem("colorIndex"));
+		paint(x, y, color);
 	};
 
 	const { height, width } = config.grid;

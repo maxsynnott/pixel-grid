@@ -2,15 +2,7 @@ import { FC } from "react";
 import { config } from "../config/config";
 import { PaletteColor } from "./PaletteColor";
 
-interface Props {
-	selectedColorIndex: number;
-	setSelectedColorIndex: (value: number) => void;
-}
-
-export const Palette: FC<Props> = ({
-	selectedColorIndex,
-	setSelectedColorIndex,
-}) => {
+export const Palette: FC = () => {
 	return (
 		<div
 			style={{
@@ -33,12 +25,7 @@ export const Palette: FC<Props> = ({
 				}}
 			>
 				{config.colors.map((_color, index) => (
-					<PaletteColor
-						key={index}
-						colorIndex={index}
-						selected={selectedColorIndex}
-						setSelected={setSelectedColorIndex}
-					/>
+					<PaletteColor key={index} colorIndex={index} />
 				))}
 			</div>
 		</div>

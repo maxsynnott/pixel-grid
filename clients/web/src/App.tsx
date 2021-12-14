@@ -6,8 +6,6 @@ import { Zoom } from "./components/Zoom";
 import { ZoomProvider } from "./contexts/ZoomContext";
 
 export const App: FC = () => {
-	const [selectedColorIndex, setSelectedColorIndex] = useState(0);
-
 	return (
 		<ZoomProvider>
 			<div
@@ -21,13 +19,10 @@ export const App: FC = () => {
 			>
 				<Zoom>
 					<Pan>
-						<Grid selectedColor={selectedColorIndex} />
+						<Grid />
 					</Pan>
 				</Zoom>
-				<Palette
-					selectedColorIndex={selectedColorIndex}
-					setSelectedColorIndex={setSelectedColorIndex}
-				/>
+				<Palette />
 			</div>
 		</ZoomProvider>
 	);
