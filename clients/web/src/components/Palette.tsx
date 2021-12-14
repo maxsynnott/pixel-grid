@@ -1,8 +1,12 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { config } from "../config/config";
 import { PaletteColor } from "./PaletteColor";
 
 export const Palette: FC = () => {
+	const [selectedColorIndex, setSelectedColorIndex] = useState(
+		Number(localStorage.getItem("colorIndex") ?? 0)
+	);
+
 	return (
 		<div
 			style={{
@@ -25,7 +29,12 @@ export const Palette: FC = () => {
 				}}
 			>
 				{config.colors.map((_color, index) => (
-					<PaletteColor key={index} colorIndex={index} />
+					<PaletteColor
+						key={index}
+						colorIndex={index}
+						selected={index === selectedColorIndex}
+						setSelectedColorIndex={setSelectedColorIndex}
+					/>
 				))}
 			</div>
 		</div>

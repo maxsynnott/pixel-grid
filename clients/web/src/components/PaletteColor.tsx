@@ -3,12 +3,19 @@ import { colorIndexToCssString } from "../helpers/colorIndexToCssString";
 
 interface Props {
 	colorIndex: number;
+	selected: boolean;
+	setSelectedColorIndex: (colorIndex: number) => void;
 }
 
-export const PaletteColor: FC<Props> = ({ colorIndex }) => {
-	const isSelected = colorIndex === Number(localStorage.getItem("colorIndex"));
-	const handleClick = () =>
+export const PaletteColor: FC<Props> = ({
+	colorIndex,
+	selected,
+	setSelectedColorIndex,
+}) => {
+	const handleClick = () => {
+		setSelectedColorIndex(colorIndex);
 		localStorage.setItem("colorIndex", colorIndex.toString());
+	};
 
 	return (
 		<div
@@ -16,7 +23,7 @@ export const PaletteColor: FC<Props> = ({ colorIndex }) => {
 				height: 30,
 				width: 30,
 				backgroundColor: colorIndexToCssString(colorIndex),
-				borderWidth: isSelected ? 3 : 0,
+				borderWidth: selected ? 3 : 0,
 				borderColor: "orange",
 				borderStyle: "solid",
 				cursor: "pointer",
