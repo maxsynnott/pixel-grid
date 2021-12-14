@@ -62,7 +62,11 @@ export const Grid: FC<Props> = ({ selectedColor }) => {
 			ref={canvasRef}
 			height={height}
 			width={width}
-			style={{ imageRendering: "pixelated", display: "block" }}
+			style={{
+				imageRendering: "pixelated",
+				display: "block",
+				cursor: "crosshair",
+			}}
 			onClick={handleClick}
 		/>
 	);

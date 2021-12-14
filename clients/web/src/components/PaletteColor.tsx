@@ -20,6 +20,10 @@ export const PaletteColor: FC<Props> = ({
 				height: 30,
 				width: 30,
 				backgroundColor: colorIndexToCssString(colorIndex),
+				borderWidth: isSelected ? 3 : 0,
+				borderColor: "orange",
+				borderStyle: "solid",
+				cursor: "pointer",
 			}}
 			onClick={() => setSelected(colorIndex)}
 		></div>

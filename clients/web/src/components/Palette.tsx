@@ -24,7 +24,8 @@ export const Palette: FC<Props> = ({
 			<div
 				style={{
 					display: "flex",
-					backgroundColor: "#FFFFFF",
+					alignItems: "center",
+					backgroundColor: "lightgray",
 					padding: 5,
 					border: "1px solid #000000",
 					borderBottom: "none",

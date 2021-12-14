@@ -19,11 +19,11 @@ export const config = {
 		[0, 255, 255, 255],
 	],
 	grid: {
-		height: 100,
-		width: 100,
+		height: 1000,
+		width: 1000,
 		zoom: {
-			initialValue: 4,
-			min: 1,
+			initialValue: 0.66,
+			min: 0.5,
 			max: 100,
 			speed: 0.1,
 		},
