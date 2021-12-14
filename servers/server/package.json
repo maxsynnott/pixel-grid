@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"dev": "ts-node-dev --respawn --transpile-only --exit-child --watch src src/index.ts",
-		"reset": "ts-node scripts/resetGrid.ts"
+		"reset": "ts-node scripts/reset.ts"
 	},
 	"keywords": [],
 	"author": "",
