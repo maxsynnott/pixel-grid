@@ -5,9 +5,9 @@ resource "aws_route53_zone" "pixelgrid" {
 resource "aws_route53_record" "validation_record" {
   zone_id = aws_route53_zone.pixelgrid.id
   ttl     = "300"
-  type    = local.domain_validation_option.resource_record_type
-  name    = local.domain_validation_option.resource_record_name
-  records = [local.domain_validation_option.resource_record_value]
+  type    = local.pixelgrid_domain_validation_option.resource_record_type
+  name    = local.pixelgrid_domain_validation_option.resource_record_name
+  records = [local.pixelgrid_domain_validation_option.resource_record_value]
 }
 
 resource "aws_route53_record" "www" {
@@ -32,4 +32,12 @@ resource "aws_route53_record" "root" {
     zone_id                = aws_cloudfront_distribution.www_distribution.hosted_zone_id
     evaluate_target_health = false
   }
+}
+
+resource "aws_route53_record" "api_pixelgrid_validation_record" {
+  zone_id = aws_route53_zone.pixelgrid.id
+  ttl     = "300"
+  type    = local.api_pixelgrid_domain_validation_option.resource_record_type
+  name    = local.api_pixelgrid_domain_validation_option.resource_record_name
+  records = [local.api_pixelgrid_domain_validation_option.resource_record_value]
 }
