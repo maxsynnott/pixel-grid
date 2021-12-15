@@ -24,6 +24,6 @@ server.ready().then(() =>
 );
 
 const port = process.env.PORT || 8080;
-server.listen(port, (err) => {
+server.listen(port, "0.0.0.0", (err) => {
 	if (!err) console.log(`Listening on port ${port}`);
 });
