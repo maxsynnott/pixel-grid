@@ -41,3 +41,15 @@ resource "aws_route53_record" "api_pixelgrid_validation_record" {
   name    = local.api_pixelgrid_domain_validation_option.resource_record_name
   records = [local.api_pixelgrid_domain_validation_option.resource_record_value]
 }
+
+resource "aws_route53_record" "api" {
+  zone_id = aws_route53_zone.pixelgrid.id
+  name    = "api.pixelgrid.xyz"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.pixelgrid.dns_name
+    zone_id                = aws_lb.pixelgrid.zone_id
+    evaluate_target_health = false
+  }
+}
