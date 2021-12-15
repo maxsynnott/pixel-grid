@@ -5,7 +5,9 @@
 	"main": "index.js",
 	"scripts": {
 		"dev": "ts-node-dev --respawn --transpile-only --exit-child --watch src src/index.ts",
-		"reset": "ts-node scripts/setPattern.ts"
+		"reset": "ts-node scripts/setPattern.ts",
+		"build": "rm -rf build && tsc",
+		"start": "node src/index.js"
 	},
 	"keywords": [],
 	"author": "",
