@@ -17,7 +17,7 @@ server.get("/healthcheck", HealthcheckController.healthcheck);
 server.get("/grid", GridController.get);
 server.post("/paint", GridController.paint);
 
-server.ready(() =>
+server.ready().then(() =>
 	server.io.on("connection", (socket: any) => {
 		console.log("Connected", { id: socket.id });
 	})

@@ -8,7 +8,7 @@ RUN npm ci && npm run build
 FROM node:14
 WORKDIR /app
 COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/build ./
+COPY --from=builder /app/build ./src
 RUN npm ci --only=production
 
 CMD ["npm", "start"]
