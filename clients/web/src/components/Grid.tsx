@@ -63,6 +63,7 @@ export const Grid: FC = () => {
 				imageRendering: "pixelated",
 				display: "block",
 				cursor: "crosshair",
+				boxShadow: `0px 0px ${config.grid.width / 100}px 0px black`,
 			}}
 			onClick={handleClick}
 		/>

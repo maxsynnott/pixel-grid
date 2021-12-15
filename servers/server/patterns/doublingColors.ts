@@ -8,7 +8,7 @@ export const doublingColors = () => {
 	const pattern = [];
 	let colorCount = 1;
 	for (let i = 0; i < pixelCount; ) {
-		for (let color = 0; color < 4; color++) {
+		for (let color = 0; color < 16; color++) {
 			for (let j = 0; j < colorCount; j++) {
 				if (i >= pixelCount) break;
 				pattern.push(color);

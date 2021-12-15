@@ -40,4 +40,4 @@ const setPattern = async (patternType: PatternType, arg?: any) => {
 };
 
 // Implement CLI
-setPattern("fullColor", 7).then(() => redis.disconnect());
+setPattern("fullColor", 0).then(() => redis.disconnect());
