@@ -1,0 +1,20 @@
+{
+	"name": "painter",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"build": "rm -rf build && tsc"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@types/aws-lambda": "^8.10.88",
+		"@types/ioredis": "^4.28.4",
+		"typescript": "^4.5.4"
+	},
+	"dependencies": {
+		"ioredis": "^4.28.2"
+	}
+}
