@@ -15,12 +15,14 @@ env:
 defaults:
   run:
     shell: bash
-    working-directory: ./clients/web
 
 jobs:
   pushSPAToS3:
     name: Push SPA to S3
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./clients/web
 
     steps:
       - name: Checkout
@@ -55,6 +57,5 @@ jobs:
 
       - name: Invalidate cache
         # TODO: Replace hard coded distribution id
+        # TODO: Wait for invalidation completion
         run: aws cloudfront create-invalidation --distribution-id E18AM2S4DCG0EX --paths "/*"
-
-      # TODO: Wait for invalidation completion

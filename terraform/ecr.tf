@@ -25,3 +25,7 @@ resource "aws_ecr_lifecycle_policy" "node_server" {
 EOF
 }
 
+data "aws_ecr_image" "node_server" {
+  repository_name = aws_ecr_repository.node_server.name
+  image_tag       = "latest"
+}

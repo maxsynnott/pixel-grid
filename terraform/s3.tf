@@ -13,3 +13,9 @@ resource "aws_s3_bucket" "spa" {
     index_document = "index.html"
   }
 }
+
+// TODO: Tighten this up to be more restrictive
+resource "aws_s3_bucket" "lb_logs" {
+  bucket = var.lb_logs_s3_bucket_name
+  policy = data.aws_iam_policy_document.lb_logs_s3_bucket_policy.json
+}

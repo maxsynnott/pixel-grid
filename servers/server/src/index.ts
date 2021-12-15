@@ -3,6 +3,7 @@ import cors from "fastify-cors";
 import socketIo from "fastify-socket.io";
 import { config } from "./config/config";
 import { GridController } from "./controllers/GridController";
+import { HealthcheckController } from "./controllers/HealthcheckController";
 
 export const server = Fastify();
 
@@ -15,6 +16,7 @@ const corsOptions = {
 server.register(cors, corsOptions);
 server.register(socketIo, { cors: corsOptions });
 
+server.get("/healthcheck", HealthcheckController.healthcheck);
 server.get("/grid", GridController.get);
 server.post("/paint", GridController.paint);
 
