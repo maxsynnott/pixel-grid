@@ -1,5 +1,12 @@
+const environment = import.meta.env.MODE;
+
 export const config = {
-	api: { baseUrl: "http://localhost:8080" },
+	api: {
+		baseUrl:
+			environment === "production"
+				? "https://api.pixelgrid.xyz"
+				: "http://localhost:8080",
+	},
 	colors: [
 		[255, 255, 255, 255],
 		[0, 0, 0, 255],

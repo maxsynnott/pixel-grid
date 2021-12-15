@@ -19,4 +19,15 @@ export const config = {
 				? ["https://pixelgrid.xyz", "https://www.pixelgrid.xyz"]
 				: "http://localhost:3000",
 	},
+	fastify: {
+		logger: {
+			prettyPrint:
+				environment === "development"
+					? {
+							translateTime: "HH:MM:ss Z",
+							ignore: "pid,hostname",
+					  }
+					: false,
+		},
+	},
 };

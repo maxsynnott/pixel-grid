@@ -8,7 +8,7 @@ import { config } from "./config/config";
 import { GridController } from "./controllers/GridController";
 import { HealthcheckController } from "./controllers/HealthcheckController";
 
-export const server = Fastify();
+export const server = Fastify(config.fastify);
 
 server.register(cors, config.cors);
 server.register(socketIo, { cors: config.cors });
