@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import Fastify from "fastify";
 import cors from "fastify-cors";
 import socketIo from "fastify-socket.io";
@@ -7,14 +10,8 @@ import { HealthcheckController } from "./controllers/HealthcheckController";
 
 export const server = Fastify();
 
-const corsOptions = {
-	origin:
-		config.environment === "production"
-			? ["https://pixelgrid.xyz", "https://www.pixelgrid.xyz"]
-			: "http://localhost:3000",
-};
-server.register(cors, corsOptions);
-server.register(socketIo, { cors: corsOptions });
+server.register(cors, config.cors);
+server.register(socketIo, { cors: config.cors });
 
 server.get("/healthcheck", HealthcheckController.healthcheck);
 server.get("/grid", GridController.get);
