@@ -1,0 +1,21 @@
+name: Provision infastructure
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - master
+    paths:
+      - terraform/**
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  provision:
+    uses: maxsynnott/pixel-grid/.github/workflows/terraformApply.yml@master
+    secrets:
+      awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      awsSecretKey: ${{ secrets.AWS_SECRET_KEY }}
