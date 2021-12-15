@@ -1,0 +1,60 @@
+name: Deploy web client
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - master
+    paths:
+      - clients/web/**
+
+env:
+  AWS_REGION: eu-west-1
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./clients/web
+
+jobs:
+  pushSPAToS3:
+    name: Push SPA to S3
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@13d241b293754004c80624b5567555c4a39ffbe3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Compile production build
+        run: npm ci && npm run build
+
+      - name: Push production build to s3
+        # TODO: Replace hardcoded bucket name
+        run: aws s3 sync ./build/ s3://pixelgrid-spa
+
+  invalidateCloudfrontCache:
+    name: Invalidate Cloudfront cache
+    needs: pushSPAToS3
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@13d241b293754004c80624b5567555c4a39ffbe3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Invalidate cache
+        # TODO: Replace hard coded distribution id
+        run: aws cloudfront create-invalidation --distribution-id E18AM2S4DCG0EX --paths "/*"
+
+      # TODO: Wait for invalidation completion
