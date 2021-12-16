@@ -4,8 +4,8 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"build": "rm -rf build && tsc",
-		"zip": "zip -r lambda.zip build"
+		"build": "rm -rf function && tsc",
+		"zip": "rm -f function.zip && zip -r function.zip function"
 	},
 	"keywords": [],
 	"author": "",
