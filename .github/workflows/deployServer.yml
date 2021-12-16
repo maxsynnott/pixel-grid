@@ -26,6 +26,7 @@ jobs:
       dockerHubAccessToken: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
   updateEcsService:
+    needs: buildAndPushImage
     uses: maxsynnott/pixel-grid/.github/workflows/terraformApply.yml@master
     with:
       target: aws_ecs_service.node_server
