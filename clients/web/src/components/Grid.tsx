@@ -2,12 +2,12 @@ import { FC, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import { getGrid, paint } from "../api/grid";
 import { socket } from "../clients/socket";
 import { config } from "../config/config";
-import { ZoomContext } from "../contexts/ZoomContext";
+import { CameraContext } from "../contexts/CameraContext";
 import { arrayBufferToImageData } from "../helpers/arrayBufferToImageData";
 import { colorIndexToCssString } from "../helpers/colorIndexToCssString";
 
 export const Grid: FC = () => {
-	const zoom = useContext(ZoomContext);
+	const { zoom } = useContext(CameraContext);
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [imageData, setImageData] = useState<ImageData>();

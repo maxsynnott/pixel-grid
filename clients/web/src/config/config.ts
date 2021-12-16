@@ -34,5 +34,8 @@ export const config = {
 			max: 100,
 			speed: 0.1,
 		},
+		pan: {
+			baseIncrement: 100,
+		},
 	},
 };

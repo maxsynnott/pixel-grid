@@ -4,12 +4,12 @@ import { Grid } from "./components/Grid";
 import { Palette } from "./components/Palette";
 import { Pan } from "./components/Pan";
 import { Zoom } from "./components/Zoom";
-import { ZoomProvider } from "./contexts/ZoomContext";
+import { CameraProvider } from "./contexts/CameraContext";
 
 export const App: FC = () => {
 	return (
 		<BrowserRouter>
-			<ZoomProvider>
+			<CameraProvider>
 				<div
 					style={{
 						height: "100%",
@@ -26,7 +26,7 @@ export const App: FC = () => {
 					</Zoom>
 					<Palette />
 				</div>
-			</ZoomProvider>
+			</CameraProvider>
 		</BrowserRouter>
 	);
 };
