@@ -13,32 +13,26 @@ interface PutPixelArgs {
 }
 
 export const Grid: FC = () => {
-	const { zoom } = useContext(CameraContext);
+	const { x, y, zoom } = useContext(CameraContext);
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [imageData, setImageData] = useState<ImageData>();
 	const [context, setContext] = useState<CanvasRenderingContext2D>();
+
+	useEffect(
+		() => setContext(canvasRef?.current?.getContext("2d") ?? undefined),
+		[canvasRef]
+	);
 
 	const fetchGrid = async () => {
 		const arrayBuffer = await getGrid();
-		const newImageData = arrayBufferToImageData(arrayBuffer);
-		setImageData(newImageData);
+		const imageData = arrayBufferToImageData(arrayBuffer);
+		context?.putImageData(imageData, 0, 0);
 	};
 
 	useEffect(() => {
+		if (!context) return;
 		fetchGrid();
-	}, []);
-
-	useEffect(() => {
-		const newContext = canvasRef?.current?.getContext("2d");
-		if (!newContext) return;
-		setContext(newContext);
-	}, [canvasRef]);
-
-	useEffect(() => {
-		if (!context || !imageData) return;
-		context.putImageData(imageData, 0, 0);
-	}, [canvasRef, imageData]);
+	}, [context]);
 
 	const putPixel = ({ x, y, color }: PutPixelArgs) => {
 		if (!context) return;
@@ -49,16 +43,15 @@ export const Grid: FC = () => {
 
 	useEffect(() => {
 		if (!context) return;
-
 		socket.on("pixel", putPixel);
 		return () => {
 			socket.off("pixel", putPixel);
 		};
-	}, [canvasRef]);
+	}, [context]);
 
 	const handleClick = (event: MouseEvent) => {
-		if (!canvasRef?.current) return;
-		const rect = canvasRef.current.getBoundingClientRect();
+		const rect = canvasRef?.current?.getBoundingClientRect();
+		if (!rect) return;
 		const pixelX = Math.floor((event.clientX - rect.left) / zoom);
 		const pixelY = Math.floor((event.clientY - rect.top) / zoom);
 		const color = Number(localStorage.getItem("colorIndex"));
@@ -76,7 +69,7 @@ export const Grid: FC = () => {
 				imageRendering: "pixelated",
 				display: "block",
 				cursor: "crosshair",
-				boxShadow: `0px 0px ${config.grid.width / 100}px 0px black`,
+				boxShadow: `0px 0px ${width / 100}px 0px black`,
 			}}
 			onClick={handleClick}
 		/>
