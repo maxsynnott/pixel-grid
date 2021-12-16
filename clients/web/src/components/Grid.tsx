@@ -1,3 +1,4 @@
+import clamp from "just-clamp";
 import { FC, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import { getGrid, updatePixel } from "../api/grid";
 import { socket } from "../clients/socket";
@@ -27,6 +28,7 @@ export const Grid: FC = () => {
 		const arrayBuffer = await getGrid();
 		const imageData = arrayBufferToImageData(arrayBuffer);
 		context?.putImageData(imageData, 0, 0);
+		updateFavicon();
 	};
 
 	useEffect(() => {
@@ -39,15 +41,37 @@ export const Grid: FC = () => {
 
 		context.fillStyle = colorIndexToCssString(color);
 		context.fillRect(x, y, 1, 1);
+		updateFavicon();
 	};
 
 	useEffect(() => {
-		if (!context) return;
 		socket.on("pixel", putPixel);
 		return () => {
 			socket.off("pixel", putPixel);
 		};
-	}, [context]);
+	}, [context, x, y]);
+
+	const updateFavicon = () => {
+		if (!context) return;
+		const snapshotCanvas = document.createElement("canvas");
+		const snapshotContext = snapshotCanvas.getContext("2d");
+		if (!snapshotContext) return;
+
+		const snapshotX = clamp(0, Math.round(x) - 8, config.grid.width - 16);
+		const snapshotY = clamp(0, Math.round(y) - 8, config.grid.width - 16);
+		snapshotCanvas.width = 16;
+		snapshotCanvas.height = 16;
+		const imageData = context.getImageData(snapshotX, snapshotY, 16, 16);
+		snapshotContext.putImageData(imageData, 0, 0);
+		const href = snapshotCanvas.toDataURL("image/png");
+		const faviconLink = document.getElementById(
+			"favicon-link"
+		) as HTMLLinkElement;
+		if (!faviconLink) return;
+		faviconLink.href = href;
+	};
+
+	useEffect(() => updateFavicon(), [x, y]);
 
 	const handleClick = (event: MouseEvent) => {
 		const rect = canvasRef?.current?.getBoundingClientRect();
