@@ -5,6 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"build": "rm -rf function && tsc",
+		"postbuild": "cd function && npm ci --production",
 		"zip": "rm -f function.zip && zip -r function.zip function"
 	},
 	"keywords": [],

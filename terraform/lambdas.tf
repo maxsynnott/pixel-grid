@@ -5,5 +5,5 @@ resource "aws_lambda_function" "painter" {
   s3_bucket     = var.painter_lambda_s3_bucket_name
   s3_key        = "function.zip"
   runtime       = "nodejs14.x"
-  handler       = "function/index.handler"
+  handler       = "function/src/index.handler"
 }

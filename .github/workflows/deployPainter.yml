@@ -18,7 +18,7 @@ defaults:
 
 jobs:
   buildAndPushZip:
-    name: Build and push image to ECR
+    name: Build and push zip to s3
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -43,3 +43,9 @@ jobs:
 
       - name: Copy zip file to s3
         run: aws s3 cp function.zip s3://pixelgrid-painter-lambda/function.zip
+
+      - name: Update lambda function code
+        run: aws lambda update-function-code --function-name painter --s3-bucket pixelgrid-painter-lambda --s3-key function.zip
+
+      - name: Wait for successful update
+        run: aws lambda wait function-updated --function-name painter
