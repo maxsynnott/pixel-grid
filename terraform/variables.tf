@@ -37,3 +37,8 @@ variable "node_server_ami_image_id" {
   type    = string
   default = "ami-06bb94c46ddc47feb"
 }
+
+variable "painter_lambda_s3_bucket_name" {
+  type    = string
+  default = "pixelgrid-painter-lambda"
+}

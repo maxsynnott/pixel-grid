@@ -19,3 +19,7 @@ resource "aws_s3_bucket" "lb_logs" {
   bucket = var.lb_logs_s3_bucket_name
   policy = data.aws_iam_policy_document.lb_logs_s3_bucket_policy.json
 }
+
+resource "aws_s3_bucket" "painter_lambda" {
+  bucket = var.painter_lambda_s3_bucket_name
+}
