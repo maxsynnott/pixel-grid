@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { server } from "..";
 import { config } from "../config/config";
 import { GridService } from "../services/GridService";
-import { PostPaintBody } from "../types/types";
+import { PatchGridBody } from "../types/types";
 
 export class GridController {
 	static get = async (request: FastifyRequest, reply: FastifyReply) => {
@@ -10,8 +10,8 @@ export class GridController {
 		reply.send(response);
 	};
 
-	static paint = async (
-		request: FastifyRequest<{ Body: PostPaintBody }>,
+	static update = async (
+		request: FastifyRequest<{ Body: PatchGridBody }>,
 		reply: FastifyReply
 	) => {
 		const { x, y, color } = request.body;
@@ -19,9 +19,9 @@ export class GridController {
 		if (x >= config.grid.width || y >= config.grid.height || color >= 16)
 			throw new Error();
 
-		await GridService.paintPixel(x, y, color);
+		await GridService.updatePixel(x, y, color);
 
-		server.io.emit("paint", { x, y, color });
+		server.io.emit("pixel", { x, y, color });
 		reply.status(204).send();
 	};
 }

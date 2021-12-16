@@ -13,8 +13,8 @@ export const getGrid = async () => {
 	}
 };
 
-export const paint = async (x: number, y: number, color: number) => {
-	const { status, data } = await axios.post("/paint", { x, y, color });
+export const updatePixel = async (x: number, y: number, color: number) => {
+	const { status, data } = await axios.patch("/grid", { x, y, color });
 
 	switch (status) {
 		case 204:

@@ -1,12 +1,12 @@
 import { FC, MouseEvent, useContext, useEffect, useRef, useState } from "react";
-import { getGrid, paint } from "../api/grid";
+import { getGrid, updatePixel } from "../api/grid";
 import { socket } from "../clients/socket";
 import { config } from "../config/config";
 import { CameraContext } from "../contexts/CameraContext";
 import { arrayBufferToImageData } from "../helpers/arrayBufferToImageData";
 import { colorIndexToCssString } from "../helpers/colorIndexToCssString";
 
-interface PaintArgs {
+interface PutPixelArgs {
 	x: number;
 	y: number;
 	color: number;
@@ -17,6 +17,7 @@ export const Grid: FC = () => {
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [imageData, setImageData] = useState<ImageData>();
+	const [context, setContext] = useState<CanvasRenderingContext2D>();
 
 	const fetchGrid = async () => {
 		const arrayBuffer = await getGrid();
@@ -29,36 +30,40 @@ export const Grid: FC = () => {
 	}, []);
 
 	useEffect(() => {
-		const context = canvasRef?.current?.getContext("2d");
+		const newContext = canvasRef?.current?.getContext("2d");
+		if (!newContext) return;
+		setContext(newContext);
+	}, [canvasRef]);
+
+	useEffect(() => {
 		if (!context || !imageData) return;
 		context.putImageData(imageData, 0, 0);
 	}, [canvasRef, imageData]);
 
-	const paintTile = ({ x, y, color }: PaintArgs) => {
-		const context = canvasRef?.current?.getContext("2d");
+	const putPixel = ({ x, y, color }: PutPixelArgs) => {
 		if (!context) return;
+
 		context.fillStyle = colorIndexToCssString(color);
 		context.fillRect(x, y, 1, 1);
 	};
 
 	useEffect(() => {
-		const context = canvasRef?.current?.getContext("2d");
 		if (!context) return;
 
-		socket.on("paint", paintTile);
+		socket.on("pixel", putPixel);
 		return () => {
-			socket.off("paint", paintTile);
+			socket.off("pixel", putPixel);
 		};
 	}, [canvasRef]);
 
 	const handleClick = (event: MouseEvent) => {
 		if (!canvasRef?.current) return;
 		const rect = canvasRef.current.getBoundingClientRect();
-		const x = Math.floor((event.clientX - rect.left) / zoom);
-		const y = Math.floor((event.clientY - rect.top) / zoom);
+		const pixelX = Math.floor((event.clientX - rect.left) / zoom);
+		const pixelY = Math.floor((event.clientY - rect.top) / zoom);
 		const color = Number(localStorage.getItem("colorIndex"));
-		paintTile({ x, y, color });
-		paint(x, y, color);
+		putPixel({ x: pixelX, y: pixelY, color });
+		updatePixel(pixelX, pixelY, color);
 	};
 
 	const { height, width } = config.grid;
