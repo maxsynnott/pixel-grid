@@ -7,6 +7,8 @@ resource "aws_lambda_function" "painter" {
   runtime       = "nodejs14.x"
   handler       = "function/src/index.handler"
   timeout       = 60
+  // TODO: Reduce to more reasonable size
+  memory_size = 10240
 
   environment {
     variables = {
