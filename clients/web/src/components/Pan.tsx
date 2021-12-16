@@ -1,6 +1,4 @@
-import clamp from "just-clamp";
-import { FC, useContext, useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { FC, useContext } from "react";
 import { config } from "../config/config";
 import { CameraContext } from "../contexts/CameraContext";
 

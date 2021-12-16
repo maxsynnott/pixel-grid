@@ -6,6 +6,12 @@ import { CameraContext } from "../contexts/CameraContext";
 import { arrayBufferToImageData } from "../helpers/arrayBufferToImageData";
 import { colorIndexToCssString } from "../helpers/colorIndexToCssString";
 
+interface PaintArgs {
+	x: number;
+	y: number;
+	color: number;
+}
+
 export const Grid: FC = () => {
 	const { zoom } = useContext(CameraContext);
 
@@ -24,25 +30,26 @@ export const Grid: FC = () => {
 
 	useEffect(() => {
 		const context = canvasRef?.current?.getContext("2d");
-		if (!context) return;
-
-		const handleEvent = ({ x, y, color }: any) => {
-			context.fillStyle = colorIndexToCssString(color);
-			context.fillRect(x, y, 1, 1);
-		};
-
-		socket.on("paint", handleEvent);
-
-		return () => {
-			socket.off("paint", handleEvent);
-		};
-	}, [canvasRef]);
-
-	useEffect(() => {
-		const context = canvasRef?.current?.getContext("2d");
 		if (!context || !imageData) return;
 		context.putImageData(imageData, 0, 0);
 	}, [canvasRef, imageData]);
+
+	const paintTile = ({ x, y, color }: PaintArgs) => {
+		const context = canvasRef?.current?.getContext("2d");
+		if (!context) return;
+		context.fillStyle = colorIndexToCssString(color);
+		context.fillRect(x, y, 1, 1);
+	};
+
+	useEffect(() => {
+		const context = canvasRef?.current?.getContext("2d");
+		if (!context) return;
+
+		socket.on("paint", paintTile);
+		return () => {
+			socket.off("paint", paintTile);
+		};
+	}, [canvasRef]);
 
 	const handleClick = (event: MouseEvent) => {
 		if (!canvasRef?.current) return;
@@ -50,12 +57,7 @@ export const Grid: FC = () => {
 		const x = Math.floor((event.clientX - rect.left) / zoom);
 		const y = Math.floor((event.clientY - rect.top) / zoom);
 		const color = Number(localStorage.getItem("colorIndex"));
-		const context = canvasRef.current.getContext("2d");
-		// TODO: Abstract painting functionality
-		if (context) {
-			context.fillStyle = colorIndexToCssString(color);
-			context.fillRect(x, y, 1, 1);
-		}
+		paintTile({ x, y, color });
 		paint(x, y, color);
 	};
 
