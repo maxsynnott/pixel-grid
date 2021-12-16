@@ -50,6 +50,12 @@ export const Grid: FC = () => {
 		const x = Math.floor((event.clientX - rect.left) / zoom);
 		const y = Math.floor((event.clientY - rect.top) / zoom);
 		const color = Number(localStorage.getItem("colorIndex"));
+		const context = canvasRef.current.getContext("2d");
+		// TODO: Abstract painting functionality
+		if (context) {
+			context.fillStyle = colorIndexToCssString(color);
+			context.fillRect(x, y, 1, 1);
+		}
 		paint(x, y, color);
 	};
 
