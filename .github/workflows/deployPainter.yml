@@ -1,0 +1,45 @@
+name: Deploy painter
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - master
+    paths:
+      - servers/lambdas/painter/**
+
+env:
+  AWS_REGION: eu-west-1
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  buildAndPushZip:
+    name: Build and push image to ECR
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./servers/lambdas/painter
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@13d241b293754004c80624b5567555c4a39ffbe3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Compile production build
+        run: npm ci && npm run build
+
+      - name: Zip production build
+        run: npm run zip
+
+      - name: Copy zip file to s3
+        run: aws s3 cp lambda.zip s3://pixelgrid-painter-lambda/lambda.zip
