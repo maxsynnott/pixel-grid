@@ -6,4 +6,17 @@ resource "aws_lambda_function" "painter" {
   s3_key        = "function.zip"
   runtime       = "nodejs14.x"
   handler       = "function/src/index.handler"
+  timeout       = 60
+
+  environment {
+    variables = {
+      REDIS_HOST = local.redis_host
+    }
+  }
+
+  // ! Must be in private VPC
+  vpc_config {
+    subnet_ids         = [aws_subnet.private_1.id, aws_subnet.private_2.id, aws_subnet.private_3.id]
+    security_group_ids = [aws_security_group.painter.id]
+  }
 }
