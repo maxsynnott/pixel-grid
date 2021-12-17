@@ -1,11 +1,8 @@
 import Panzoom, { PanzoomObject, PanzoomOptions } from "@panzoom/panzoom";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { config } from "../config/config";
 import { convertCoordinates } from "../helpers/convertCoordinates";
 import { PanzoomEvent, PanzoomDetail } from "../types/types";
 
-const { width, height } = config.grid;
 const DEFAULT_OPTIONS: PanzoomOptions = {
 	cursor: "crosshair",
 	minScale: 0.25,
@@ -13,17 +10,18 @@ const DEFAULT_OPTIONS: PanzoomOptions = {
 	step: 0.15,
 };
 
+const initialQueryParams = new URLSearchParams(document.location.search);
+
 export const usePanzoom = (element?: HTMLElement) => {
 	const [panzoomDetails, setPanzoomDetails] = useState<PanzoomDetail>();
-	const [searchParams, setSearchParams] = useSearchParams();
 	const [panzoom, setPanzoom] = useState<PanzoomObject>();
 
 	useEffect(() => {
 		const { x: startX, y: startY } = convertCoordinates({
-			x: Number(searchParams.get("x") ?? 500),
-			y: Number(searchParams.get("y") ?? 500),
+			x: Number(initialQueryParams.get("x") ?? 500),
+			y: Number(initialQueryParams.get("y") ?? 500),
 		});
-		const startScale = Number(searchParams.get("scale") ?? 0.5);
+		const startScale = Number(initialQueryParams.get("scale") ?? 0.5);
 		const options: PanzoomOptions = {
 			...DEFAULT_OPTIONS,
 			startX,
@@ -39,11 +37,14 @@ export const usePanzoom = (element?: HTMLElement) => {
 			const { x, y, scale } = event.detail;
 			const coordinates = convertCoordinates({ x, y });
 			setPanzoomDetails({ ...coordinates, scale });
-			setSearchParams({
-				x: coordinates.x.toFixed(2),
-				y: coordinates.y.toFixed(2),
-				scale: scale.toFixed(2),
-			});
+			const updatedParams = new URLSearchParams(
+				Object.entries({
+					x: coordinates.x.toFixed(2),
+					y: coordinates.y.toFixed(2),
+					scale: scale.toFixed(2),
+				})
+			);
+			history.replaceState({}, "", `?${updatedParams.toString()}`);
 		};
 		element.parentElement?.addEventListener("wheel", panzoom.zoomWithWheel);
 		element.addEventListener("panzoomchange", onChange as any);

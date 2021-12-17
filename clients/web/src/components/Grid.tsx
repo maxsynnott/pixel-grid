@@ -19,10 +19,7 @@ interface PutPixelArgs {
 export const Grid: FC = () => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement>();
-	useEffect(
-		() => setCanvasElement(canvasRef.current ?? undefined),
-		[canvasRef]
-	);
+	const [imageData, setImageData] = useState<ImageData>();
 	const { x, y, scale } = usePanzoom(canvasElement);
 	const [context, setContext] = useState<CanvasRenderingContext2D>();
 	const [mouseDownCoordinates, setMouseDownCoordinates] = useState({
@@ -32,14 +29,18 @@ export const Grid: FC = () => {
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(
-		() => setContext(canvasElement?.getContext("2d") ?? undefined),
-		[canvasElement]
+		() => setCanvasElement(canvasRef.current ?? undefined),
+		[canvasRef]
 	);
 
 	useEffect(() => {
-		if (!context) return;
 		fetchGrid();
-	}, [context]);
+	}, []);
+
+	useEffect(
+		() => setContext(canvasElement?.getContext("2d") ?? undefined),
+		[canvasElement]
+	);
 
 	useEffect(() => {
 		socket.on("pixel", putPixel);
@@ -50,9 +51,16 @@ export const Grid: FC = () => {
 
 	useEffect(() => updateFavicon(), [x, y]);
 
+	useEffect(() => applyImageData(), [context, imageData]);
+
 	const fetchGrid = async () => {
 		const arrayBuffer = await getGrid();
-		const imageData = arrayBufferToImageData(arrayBuffer);
+		const data = arrayBufferToImageData(arrayBuffer);
+		setImageData(data);
+	};
+
+	const applyImageData = () => {
+		if (!imageData) return;
 		context?.putImageData(imageData, 0, 0);
 		setIsLoading(false);
 		updateFavicon();
