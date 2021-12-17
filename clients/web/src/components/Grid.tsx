@@ -1,11 +1,14 @@
 import clamp from "just-clamp";
 import { FC, MouseEvent, useEffect, useRef, useState } from "react";
+import Loading from "react-loading";
 import { getGrid, updatePixel } from "../api/grid";
 import { socket } from "../clients/socket";
 import { config } from "../config/config";
 import { arrayBufferToImageData } from "../helpers/arrayBufferToImageData";
 import { colorIndexToCssString } from "../helpers/colorIndexToCssString";
 import { usePanzoom } from "../hooks/usePanzoom";
+
+const { height, width } = config.grid;
 
 interface PutPixelArgs {
 	x: number;
@@ -26,23 +29,34 @@ export const Grid: FC = () => {
 		x: 0,
 		y: 0,
 	});
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(
 		() => setContext(canvasElement?.getContext("2d") ?? undefined),
 		[canvasElement]
 	);
 
-	const fetchGrid = async () => {
-		const arrayBuffer = await getGrid();
-		const imageData = arrayBufferToImageData(arrayBuffer);
-		context?.putImageData(imageData, 0, 0);
-		updateFavicon();
-	};
-
 	useEffect(() => {
 		if (!context) return;
 		fetchGrid();
 	}, [context]);
+
+	useEffect(() => {
+		socket.on("pixel", putPixel);
+		return () => {
+			socket.off("pixel", putPixel);
+		};
+	}, [context, x, y]);
+
+	useEffect(() => updateFavicon(), [x, y]);
+
+	const fetchGrid = async () => {
+		const arrayBuffer = await getGrid();
+		const imageData = arrayBufferToImageData(arrayBuffer);
+		context?.putImageData(imageData, 0, 0);
+		setIsLoading(false);
+		updateFavicon();
+	};
 
 	const putPixel = ({ x, y, color }: PutPixelArgs) => {
 		if (!context) return;
@@ -51,13 +65,6 @@ export const Grid: FC = () => {
 		context.fillRect(x, y, 1, 1);
 		updateFavicon();
 	};
-
-	useEffect(() => {
-		socket.on("pixel", putPixel);
-		return () => {
-			socket.off("pixel", putPixel);
-		};
-	}, [context, x, y]);
 
 	const updateFavicon = () => {
 		const snapshotCanvas = document.createElement("canvas");
@@ -75,8 +82,6 @@ export const Grid: FC = () => {
 		) as HTMLLinkElement;
 		if (faviconLink) faviconLink.href = href;
 	};
-
-	useEffect(() => updateFavicon(), [x, y]);
 
 	const handleMouseDown = ({ clientX, clientY }: MouseEvent) =>
 		setMouseDownCoordinates({ x: clientX, y: clientY });
@@ -96,20 +101,22 @@ export const Grid: FC = () => {
 		updatePixel(pixelX, pixelY, color);
 	};
 
-	const { height, width } = config.grid;
 	return (
-		<canvas
-			ref={canvasRef}
-			height={height}
-			width={width}
-			style={{
-				imageRendering: "pixelated",
-				display: "block",
-				cursor: "crosshair",
-				boxShadow: `0px 0px ${width / 100}px 0px black`,
-			}}
-			onPointerDownCapture={handleMouseDown}
-			onPointerUpCapture={handleMouseUp}
-		/>
+		<>
+			<canvas
+				ref={canvasRef}
+				height={height}
+				width={width}
+				style={{
+					imageRendering: "pixelated",
+					display: isLoading ? "none" : "block",
+					cursor: "crosshair",
+					boxShadow: `0px 0px ${width / 100}px 0px black`,
+				}}
+				onPointerDownCapture={handleMouseDown}
+				onPointerUpCapture={handleMouseUp}
+			/>
+			{isLoading && <Loading type="cubes" width={100} height={100} />}
+		</>
 	);
 };
