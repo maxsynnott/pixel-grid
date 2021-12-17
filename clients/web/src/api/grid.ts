@@ -1,4 +1,5 @@
 import { axios } from "../clients/axios";
+import { UpdatePixelBody } from "../types/types";
 
 export const getGrid = async () => {
 	const { status, data } = await axios.get<ArrayBuffer>("/grid", {
@@ -13,8 +14,8 @@ export const getGrid = async () => {
 	}
 };
 
-export const updatePixel = async (x: number, y: number, color: number) => {
-	const { status, data } = await axios.patch("/grid", { x, y, color });
+export const updatePixel = async (body: UpdatePixelBody) => {
+	const { status, data } = await axios.patch("/grid", body);
 
 	switch (status) {
 		case 204:

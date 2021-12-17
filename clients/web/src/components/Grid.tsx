@@ -1,6 +1,12 @@
 import clamp from "just-clamp";
-import { FC, MouseEvent, useEffect, useRef, useState } from "react";
-import Loading from "react-loading";
+import {
+	FC,
+	MouseEvent,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { updatePixel } from "../api/grid";
 import { socket } from "../clients/socket";
 import { config } from "../config/config";
@@ -22,29 +28,44 @@ interface Props {
 
 export const Grid: FC<Props> = ({ imageData }) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement>();
-	const { x, y, scale } = usePanzoom(canvasElement);
 	const [context, setContext] = useState<CanvasRenderingContext2D>();
+	useEffect(() => {
+		setContext(canvasRef?.current?.getContext("2d") ?? undefined);
+	}, [canvasRef]);
+
 	const [mouseDownCoordinates, setMouseDownCoordinates] = useState({
 		x: 0,
 		y: 0,
 	});
-	const [isLoading, setIsLoading] = useState(true);
+	const [isRendering, setIsRendering] = useState(true);
+
+	const { x, y, scale } = usePanzoom(canvasRef?.current ?? undefined);
 	const { setFaviconImageData } = useFavicon();
 
-	useEffect(
-		() => setCanvasElement(canvasRef.current ?? undefined),
-		[canvasRef]
-	);
+	const updateFavicon = useCallback(() => {
+		if (!context) return;
 
-	useEffect(
-		() => setContext(canvasElement?.getContext("2d") ?? undefined),
-		[canvasElement]
+		const snapshotX = clamp(0, Math.round(x ?? 0) - 8, config.grid.width - 16);
+		const snapshotY = clamp(0, Math.round(y ?? 0) - 8, config.grid.width - 16);
+		const imageData = context.getImageData(snapshotX, snapshotY, 16, 16);
+		setFaviconImageData(imageData);
+	}, [context, x, y]);
+
+	const putPixel = useCallback(
+		({ x, y, color }: PutPixelArgs) => {
+			if (!context) return;
+
+			context.fillStyle = colorIndexToCssString(color);
+			context.fillRect(x, y, 1, 1);
+			updateFavicon();
+		},
+		[context, x, y, updateFavicon]
 	);
 
 	useEffect(() => {
-		context?.putImageData(imageData, 0, 0);
-		setIsLoading(false);
+		if (!context) return;
+		context.putImageData(imageData, 0, 0);
+		setIsRendering(false);
 		updateFavicon();
 	}, [context]);
 
@@ -53,42 +74,28 @@ export const Grid: FC<Props> = ({ imageData }) => {
 		return () => {
 			socket.off("pixel", putPixel);
 		};
-	}, [context, x, y]);
+	}, [putPixel]);
 
 	useEffect(() => updateFavicon(), [x, y]);
-
-	const putPixel = ({ x, y, color }: PutPixelArgs) => {
-		if (!context) return;
-
-		context.fillStyle = colorIndexToCssString(color);
-		context.fillRect(x, y, 1, 1);
-		updateFavicon();
-	};
-
-	const updateFavicon = () => {
-		if (!context) return;
-		const snapshotX = clamp(0, Math.round(x ?? 0) - 8, config.grid.width - 16);
-		const snapshotY = clamp(0, Math.round(y ?? 0) - 8, config.grid.width - 16);
-		const imageData = context.getImageData(snapshotX, snapshotY, 16, 16);
-		setFaviconImageData(imageData);
-	};
 
 	const handleMouseDown = ({ clientX, clientY }: MouseEvent) =>
 		setMouseDownCoordinates({ x: clientX, y: clientY });
 
 	const handleMouseUp = (event: MouseEvent) => {
-		const movement =
+		const rect = canvasRef?.current?.getBoundingClientRect();
+		if (!rect || scale === undefined) return;
+
+		const dragDistance =
 			Math.abs(mouseDownCoordinates.x - event.clientX) +
 			Math.abs(mouseDownCoordinates.y - event.clientY);
-		if (movement > 10) return;
+		if (dragDistance > 10) return;
 
-		const rect = canvasElement?.getBoundingClientRect();
-		if (!rect || scale === undefined) return;
 		const pixelX = Math.floor((event.clientX - rect.left) / scale);
 		const pixelY = Math.floor((event.clientY - rect.top) / scale);
 		const color = Number(localStorage.getItem("colorIndex"));
-		putPixel({ x: pixelX, y: pixelY, color });
-		updatePixel(pixelX, pixelY, color);
+		const payload = { x: pixelX, y: pixelY, color };
+		putPixel(payload);
+		updatePixel(payload);
 	};
 
 	return (
@@ -96,7 +103,7 @@ export const Grid: FC<Props> = ({ imageData }) => {
 			ref={canvasRef}
 			height={height}
 			width={width}
-			style={{ display: isLoading ? "none" : "block" }}
+			style={{ display: isRendering ? "none" : "block" }}
 			id="grid"
 			onPointerDownCapture={handleMouseDown}
 			onPointerUpCapture={handleMouseUp}

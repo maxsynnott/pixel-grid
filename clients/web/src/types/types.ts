@@ -12,3 +12,7 @@ export interface Coordinates {
 	x: number;
 	y: number;
 }
+
+export interface UpdatePixelBody extends Coordinates {
+	color: number;
+}
