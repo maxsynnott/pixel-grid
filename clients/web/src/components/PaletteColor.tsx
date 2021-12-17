@@ -25,14 +25,12 @@ export const PaletteColor: FC<Props> = ({
 
 	return (
 		<div
+			className="palette-color"
 			style={{
-				height: 30,
-				width: 30,
 				backgroundColor: colorIndexToCssString(colorIndex),
-				cursor: "pointer",
 				...(selected ? selectedStyles : {}),
 			}}
 			onClick={handleClick}
-		></div>
+		/>
 	);
 };

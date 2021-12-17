@@ -8,28 +8,8 @@ export const Palette: FC = () => {
 	);
 
 	return (
-		<div
-			style={{
-				position: "absolute",
-				bottom: 15,
-				left: 15,
-			}}
-		>
-			<div
-				style={{
-					display: "grid",
-					backgroundColor: "orange",
-					gridTemplateRows: "min-content min-content min-content min-content",
-					gridTemplateColumns:
-						"min-content min-content min-content min-content",
-					border: "1px solid #000000",
-					borderBottom: "none",
-					borderRadius: 2,
-					alignItems: "center",
-					justifyItems: "center",
-					padding: 2,
-				}}
-			>
+		<div id="palette-container">
+			<div id="palette">
 				{config.colors.map((_color, index) => (
 					<PaletteColor
 						key={index}

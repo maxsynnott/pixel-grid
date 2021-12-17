@@ -18,3 +18,48 @@ code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
 		monospace;
 }
+
+.centered {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.full-height {
+	height: 100%;
+}
+
+.overflow-hidden {
+	overflow: hidden;
+}
+
+#grid {
+	image-rendering: pixelated;
+	cursor: crosshair;
+	box-shadow: 0 0 10px 0 black;
+}
+
+#palette-container {
+	position: absolute;
+	bottom: 15px;
+	left: 15px;
+}
+
+#palette {
+	display: grid;
+	background-color: orange;
+	grid-template-rows: min-content min-content min-content min-content;
+	grid-template-columns: min-content min-content min-content min-content;
+	border: 1px solid #000000;
+	border-bottom: none;
+	align-items: center;
+	justify-items: center;
+	padding: 2px;
+	border-radius: 2px;
+}
+
+.palette-color {
+	height: 30px;
+	width: 30px;
+	cursor: pointer;
+}

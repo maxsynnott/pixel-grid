@@ -115,12 +115,8 @@ export const Grid: FC = () => {
 				ref={canvasRef}
 				height={height}
 				width={width}
-				style={{
-					imageRendering: "pixelated",
-					display: isLoading ? "none" : "block",
-					cursor: "crosshair",
-					boxShadow: `0px 0px ${width / 100}px 0px black`,
-				}}
+				style={{ display: isLoading ? "none" : "block" }}
+				id="grid"
 				onPointerDownCapture={handleMouseDown}
 				onPointerUpCapture={handleMouseUp}
 			/>
