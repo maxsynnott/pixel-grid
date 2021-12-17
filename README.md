@@ -4,7 +4,6 @@ A realtime shared canvas for collaborative art/creativity
 
 ## Current state
 
-Basic implementation for desktop done.
-Arrow keys to move, scroll to zoom, click to place pixels
+Initial implementation complete
 
 [pixelgrid.xyz](https://www.pixelgrid.xyz)
