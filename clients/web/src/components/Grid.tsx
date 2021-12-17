@@ -1,11 +1,11 @@
 import clamp from "just-clamp";
-import { FC, MouseEvent, useContext, useEffect, useRef, useState } from "react";
+import { FC, MouseEvent, useEffect, useRef, useState } from "react";
 import { getGrid, updatePixel } from "../api/grid";
 import { socket } from "../clients/socket";
 import { config } from "../config/config";
-import { CameraContext } from "../contexts/CameraContext";
 import { arrayBufferToImageData } from "../helpers/arrayBufferToImageData";
 import { colorIndexToCssString } from "../helpers/colorIndexToCssString";
+import { usePanzoom } from "../hooks/usePanzoom";
 
 interface PutPixelArgs {
 	x: number;
@@ -14,14 +14,18 @@ interface PutPixelArgs {
 }
 
 export const Grid: FC = () => {
-	const { x, y, zoom } = useContext(CameraContext);
-
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement>();
+	useEffect(
+		() => setCanvasElement(canvasRef.current ?? undefined),
+		[canvasRef]
+	);
+	const { x, y, scale } = usePanzoom(canvasElement);
 	const [context, setContext] = useState<CanvasRenderingContext2D>();
 
 	useEffect(
-		() => setContext(canvasRef?.current?.getContext("2d") ?? undefined),
-		[canvasRef]
+		() => setContext(canvasElement?.getContext("2d") ?? undefined),
+		[canvasElement]
 	);
 
 	const fetchGrid = async () => {
@@ -49,14 +53,12 @@ export const Grid: FC = () => {
 		return () => {
 			socket.off("pixel", putPixel);
 		};
-	}, [context, x, y]);
+	}, [context]);
 
 	const updateFavicon = () => {
-		if (!context) return;
 		const snapshotCanvas = document.createElement("canvas");
 		const snapshotContext = snapshotCanvas.getContext("2d");
-		if (!snapshotContext) return;
-
+		if (!snapshotContext || !context || !x || !y) return;
 		const snapshotX = clamp(0, Math.round(x) - 8, config.grid.width - 16);
 		const snapshotY = clamp(0, Math.round(y) - 8, config.grid.width - 16);
 		snapshotCanvas.width = 16;
@@ -74,10 +76,10 @@ export const Grid: FC = () => {
 	useEffect(() => updateFavicon(), [x, y]);
 
 	const handleClick = (event: MouseEvent) => {
-		const rect = canvasRef?.current?.getBoundingClientRect();
-		if (!rect) return;
-		const pixelX = Math.floor((event.clientX - rect.left) / zoom);
-		const pixelY = Math.floor((event.clientY - rect.top) / zoom);
+		const rect = canvasElement?.getBoundingClientRect();
+		if (!rect || scale === undefined) return;
+		const pixelX = Math.floor((event.clientX - rect.left) / scale);
+		const pixelY = Math.floor((event.clientY - rect.top) / scale);
 		const color = Number(localStorage.getItem("colorIndex"));
 		putPixel({ x: pixelX, y: pixelY, color });
 		updatePixel(pixelX, pixelY, color);

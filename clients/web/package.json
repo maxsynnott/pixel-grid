@@ -7,6 +7,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@panzoom/panzoom": "^4.4.3",
 		"axios": "^0.24.0",
 		"just-clamp": "^4.0.1",
 		"react": "^17.0.2",
