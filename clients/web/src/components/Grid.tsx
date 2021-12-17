@@ -22,6 +22,10 @@ export const Grid: FC = () => {
 	);
 	const { x, y, scale } = usePanzoom(canvasElement);
 	const [context, setContext] = useState<CanvasRenderingContext2D>();
+	const [mouseDownCoordinates, setMouseDownCoordinates] = useState({
+		x: 0,
+		y: 0,
+	});
 
 	useEffect(
 		() => setContext(canvasElement?.getContext("2d") ?? undefined),
@@ -53,14 +57,14 @@ export const Grid: FC = () => {
 		return () => {
 			socket.off("pixel", putPixel);
 		};
-	}, [context]);
+	}, [context, x, y]);
 
 	const updateFavicon = () => {
 		const snapshotCanvas = document.createElement("canvas");
 		const snapshotContext = snapshotCanvas.getContext("2d");
-		if (!snapshotContext || !context || !x || !y) return;
-		const snapshotX = clamp(0, Math.round(x) - 8, config.grid.width - 16);
-		const snapshotY = clamp(0, Math.round(y) - 8, config.grid.width - 16);
+		if (!snapshotContext || !context) return;
+		const snapshotX = clamp(0, Math.round(x ?? 0) - 8, config.grid.width - 16);
+		const snapshotY = clamp(0, Math.round(y ?? 0) - 8, config.grid.width - 16);
 		snapshotCanvas.width = 16;
 		snapshotCanvas.height = 16;
 		const imageData = context.getImageData(snapshotX, snapshotY, 16, 16);
@@ -69,13 +73,20 @@ export const Grid: FC = () => {
 		const faviconLink = document.getElementById(
 			"favicon-link"
 		) as HTMLLinkElement;
-		if (!faviconLink) return;
-		faviconLink.href = href;
+		if (faviconLink) faviconLink.href = href;
 	};
 
 	useEffect(() => updateFavicon(), [x, y]);
 
-	const handleClick = (event: MouseEvent) => {
+	const handleMouseDown = ({ clientX, clientY }: MouseEvent) =>
+		setMouseDownCoordinates({ x: clientX, y: clientY });
+
+	const handleMouseUp = (event: MouseEvent) => {
+		const movement =
+			Math.abs(mouseDownCoordinates.x - event.clientX) +
+			Math.abs(mouseDownCoordinates.y - event.clientY);
+		if (movement > 10) return;
+
 		const rect = canvasElement?.getBoundingClientRect();
 		if (!rect || scale === undefined) return;
 		const pixelX = Math.floor((event.clientX - rect.left) / scale);
@@ -97,7 +108,8 @@ export const Grid: FC = () => {
 				cursor: "crosshair",
 				boxShadow: `0px 0px ${width / 100}px 0px black`,
 			}}
-			onClick={handleClick}
+			onPointerDownCapture={handleMouseDown}
+			onPointerUpCapture={handleMouseUp}
 		/>
 	);
 };
