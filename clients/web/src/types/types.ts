@@ -7,3 +7,8 @@ export interface PanzoomDetail {
 export interface PanzoomEvent extends Event {
 	detail: PanzoomDetail;
 }
+
+export interface Coordinates {
+	x: number;
+	y: number;
+}

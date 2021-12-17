@@ -7,7 +7,8 @@ export const arrayBufferToImageData = (ArrayBuffer: ArrayBuffer): ImageData => {
 		const int = intArray[i];
 		// Unpack 8 bit int into 2 4 bit ints
 		const colorA = int >> 4;
-		const colorB = int & 15;
+		const bitMask = 15;
+		const colorB = int & bitMask;
 		// Convert 4 bit ints into 4 byte rgba values
 		rgbaArray.push(...config.colors[colorA], ...config.colors[colorB]);
 	}
