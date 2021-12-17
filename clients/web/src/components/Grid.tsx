@@ -1,11 +1,11 @@
 import clamp from "just-clamp";
 import { FC, MouseEvent, useEffect, useRef, useState } from "react";
 import Loading from "react-loading";
-import { getGrid, updatePixel } from "../api/grid";
+import { updatePixel } from "../api/grid";
 import { socket } from "../clients/socket";
 import { config } from "../config/config";
-import { arrayBufferToImageData } from "../helpers/arrayBufferToImageData";
 import { colorIndexToCssString } from "../helpers/colorIndexToCssString";
+import { useFavicon } from "../hooks/useFavicon";
 import { usePanzoom } from "../hooks/usePanzoom";
 
 const { height, width } = config.grid;
@@ -16,10 +16,13 @@ interface PutPixelArgs {
 	color: number;
 }
 
-export const Grid: FC = () => {
+interface Props {
+	imageData: ImageData;
+}
+
+export const Grid: FC<Props> = ({ imageData }) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement>();
-	const [imageData, setImageData] = useState<ImageData>();
 	const { x, y, scale } = usePanzoom(canvasElement);
 	const [context, setContext] = useState<CanvasRenderingContext2D>();
 	const [mouseDownCoordinates, setMouseDownCoordinates] = useState({
@@ -27,20 +30,23 @@ export const Grid: FC = () => {
 		y: 0,
 	});
 	const [isLoading, setIsLoading] = useState(true);
+	const { setFaviconImageData } = useFavicon();
 
 	useEffect(
 		() => setCanvasElement(canvasRef.current ?? undefined),
 		[canvasRef]
 	);
 
-	useEffect(() => {
-		fetchGrid();
-	}, []);
-
 	useEffect(
 		() => setContext(canvasElement?.getContext("2d") ?? undefined),
 		[canvasElement]
 	);
+
+	useEffect(() => {
+		context?.putImageData(imageData, 0, 0);
+		setIsLoading(false);
+		updateFavicon();
+	}, [context]);
 
 	useEffect(() => {
 		socket.on("pixel", putPixel);
@@ -51,21 +57,6 @@ export const Grid: FC = () => {
 
 	useEffect(() => updateFavicon(), [x, y]);
 
-	useEffect(() => applyImageData(), [context, imageData]);
-
-	const fetchGrid = async () => {
-		const arrayBuffer = await getGrid();
-		const data = arrayBufferToImageData(arrayBuffer);
-		setImageData(data);
-	};
-
-	const applyImageData = () => {
-		if (!imageData) return;
-		context?.putImageData(imageData, 0, 0);
-		setIsLoading(false);
-		updateFavicon();
-	};
-
 	const putPixel = ({ x, y, color }: PutPixelArgs) => {
 		if (!context) return;
 
@@ -75,20 +66,11 @@ export const Grid: FC = () => {
 	};
 
 	const updateFavicon = () => {
-		const snapshotCanvas = document.createElement("canvas");
-		const snapshotContext = snapshotCanvas.getContext("2d");
-		if (!snapshotContext || !context) return;
+		if (!context) return;
 		const snapshotX = clamp(0, Math.round(x ?? 0) - 8, config.grid.width - 16);
 		const snapshotY = clamp(0, Math.round(y ?? 0) - 8, config.grid.width - 16);
-		snapshotCanvas.width = 16;
-		snapshotCanvas.height = 16;
 		const imageData = context.getImageData(snapshotX, snapshotY, 16, 16);
-		snapshotContext.putImageData(imageData, 0, 0);
-		const href = snapshotCanvas.toDataURL("image/png");
-		const faviconLink = document.getElementById(
-			"favicon-link"
-		) as HTMLLinkElement;
-		if (faviconLink) faviconLink.href = href;
+		setFaviconImageData(imageData);
 	};
 
 	const handleMouseDown = ({ clientX, clientY }: MouseEvent) =>
@@ -110,17 +92,14 @@ export const Grid: FC = () => {
 	};
 
 	return (
-		<>
-			<canvas
-				ref={canvasRef}
-				height={height}
-				width={width}
-				style={{ display: isLoading ? "none" : "block" }}
-				id="grid"
-				onPointerDownCapture={handleMouseDown}
-				onPointerUpCapture={handleMouseUp}
-			/>
-			{isLoading && <Loading type="cubes" width={100} height={100} />}
-		</>
+		<canvas
+			ref={canvasRef}
+			height={height}
+			width={width}
+			style={{ display: isLoading ? "none" : "block" }}
+			id="grid"
+			onPointerDownCapture={handleMouseDown}
+			onPointerUpCapture={handleMouseUp}
+		/>
 	);
 };
