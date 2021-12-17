@@ -17,16 +17,20 @@ export const PaletteColor: FC<Props> = ({
 		localStorage.setItem("colorIndex", colorIndex.toString());
 	};
 
+	const selectedStyles = {
+		margin: 2,
+		padding: 4,
+		borderRadius: 10,
+	};
+
 	return (
 		<div
 			style={{
 				height: 30,
 				width: 30,
 				backgroundColor: colorIndexToCssString(colorIndex),
-				borderWidth: selected ? 3 : 0,
-				borderColor: "orange",
-				borderStyle: "solid",
 				cursor: "pointer",
+				...(selected ? selectedStyles : {}),
 			}}
 			onClick={handleClick}
 		></div>

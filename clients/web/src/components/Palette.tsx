@@ -11,21 +11,23 @@ export const Palette: FC = () => {
 		<div
 			style={{
 				position: "absolute",
-				bottom: 0,
-				width: "100%",
-				justifyContent: "center",
-				display: "flex",
+				bottom: 15,
+				left: 15,
 			}}
 		>
 			<div
 				style={{
-					display: "flex",
-					alignItems: "center",
-					backgroundColor: "lightgray",
-					padding: 5,
+					display: "grid",
+					backgroundColor: "orange",
+					gridTemplateRows: "min-content min-content min-content min-content",
+					gridTemplateColumns:
+						"min-content min-content min-content min-content",
 					border: "1px solid #000000",
 					borderBottom: "none",
 					borderRadius: 2,
+					alignItems: "center",
+					justifyItems: "center",
+					padding: 2,
 				}}
 			>
 				{config.colors.map((_color, index) => (
